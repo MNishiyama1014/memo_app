@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:memo_app/pages/all_memos_page.dart';
 import '../models/memo.dart';
 import '../widgets/memo_tile.dart';
 
@@ -35,56 +36,109 @@ class _MemoListViewState extends State<MemoListView> {
       itemBuilder: (context, index) {
         return Column(
           children: [
-            Slidable(
-              key: UniqueKey(),
-              endActionPane: ActionPane(
-                extentRatio: 0.2,
-                motion: const ScrollMotion(),
-                children: [
-                  if (widget.onDeleteTapped != null)
-                    SlidableAction(
-                      onPressed: (context) async {
-                        widget.onDeleteTapped!(widget.memos[index]);
-                      },
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete,
-                      label: 'Delete',
+            if (widget.onDeleteTapped != null)
+              Dismissible(
+                // Each Dismissible must contain a Key. Keys allow Flutter to
+                // uniquely identify widgets.
+                key: UniqueKey(),
+                // Provide a function that tells the app
+                // what to do after an item has been swiped away.
+                onDismissed: (direction) {
+                  if (direction == DismissDirection.endToStart)
+                    // Remove the item from the data source.
+                    widget.onDeleteTapped!(widget.memos[index]);
+
+                  // Then show a snackbar.
+                  String temp_str = widget.memos[index].title;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$temp_str deleted')));
+                },
+                // Show a red background as the item is swiped away.
+                background: const ColoredBox(
+                  color: Colors.red,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Icon(Icons.delete, color: Colors.white),
                     ),
-                  if (widget.onRestoreTapped != null)
-                    SlidableAction(
-                      onPressed: (context) async {
-                        widget.onRestoreTapped!(widget.memos[index]);
-                      },
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      icon: Icons.restore,
-                      label: 'Restore',
+                  ),
+                ),
+                secondaryBackground: const ColoredBox(
+                  color: Colors.red,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Icon(Icons.delete, color: Colors.white),
                     ),
-                  if (widget.onDeletePermanentlyTapped != null)
-                    SlidableAction(
-                      onPressed: (context) async {
-                        widget.onDeletePermanentlyTapped!(widget.memos[index]);
-                      },
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      icon: Icons.delete_forever,
-                      label: 'Delete Permanently',
-                    ),
-                ],
-              ),
-              child: InkWell(
-                child: MemoTile(
-                  memo: widget.memos[index],
-                  onTap: () {
-                    widget.onMemoTapped(widget.memos[index]);
-                  },
-                  onFavoriteTapped: () {
-                    widget.onFavoriteTapped(widget.memos[index]);
-                  },
+                  ),
+                ),
+                child: InkWell(
+                  child: MemoTile(
+                    memo: widget.memos[index],
+                    onTap: () {
+                      widget.onMemoTapped(widget.memos[index]);
+                    },
+                    onFavoriteTapped: () {
+                      widget.onFavoriteTapped(widget.memos[index]);
+                    },
+                  ),
                 ),
               ),
-            ),
+            if (widget.onRestoreTapped != null ||
+                widget.onDeletePermanentlyTapped != null)
+              Dismissible(
+                // Each Dismissible must contain a Key. Keys allow Flutter to
+                // uniquely identify widgets.
+                key: UniqueKey(),
+                // Provide a function that tells the app
+                // what to do after an item has been swiped away.
+                onDismissed: (direction) {
+                  // Remove the item from the data source.
+                  if (direction == DismissDirection.startToEnd)
+                    widget.onRestoreTapped!(widget.memos[index]);
+                  else if (direction == DismissDirection.endToStart)
+                    widget.onDeletePermanentlyTapped!(widget.memos[index]);
+
+                  // Then show a snackbar.
+                  String temp_str = widget.memos[index].title;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$temp_str restored')));
+                },
+                // Show a red background as the item is swiped away.
+                background: const ColoredBox(
+                  color: Colors.green,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Icon(Icons.restore, color: Colors.white),
+                    ),
+                  ),
+                ),
+                secondaryBackground: const ColoredBox(
+                  color: Colors.red,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                  ),
+                ),
+                child: InkWell(
+                  child: MemoTile(
+                    memo: widget.memos[index],
+                    onTap: () {
+                      widget.onMemoTapped(widget.memos[index]);
+                    },
+                    onFavoriteTapped: () {
+                      widget.onFavoriteTapped(widget.memos[index]);
+                    },
+                  ),
+                ),
+              ),
             const Divider(height: 0),
           ],
         );
