@@ -50,8 +50,9 @@ class _MemoListViewState extends State<MemoListView> {
 
                   // Then show a snackbar.
                   String temp_str = widget.memos[index].title;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$temp_str deleted')));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('$temp_str deleted'),
+                      backgroundColor: Colors.red));
                 },
                 // Show a red background as the item is swiped away.
                 background: const ColoredBox(
@@ -103,8 +104,9 @@ class _MemoListViewState extends State<MemoListView> {
 
                   // Then show a snackbar.
                   String temp_str = widget.memos[index].title;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$temp_str restored')));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('$temp_str restored'),
+                      backgroundColor: Colors.green));
                 },
                 // Show a red background as the item is swiped away.
                 background: const ColoredBox(
